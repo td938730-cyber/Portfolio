@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Your Name] | ME CSE Developer & Researcher</title>
+    
+    <!-- CDNs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0a0a0a',
+                        surface: '#111111',
+                        accent: '#3b82f6',
+                    },
+                    fontFamily: {
+                        heading: ['Space Grotesk', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- 1. FLUID TYPOGRAPHY --- */
+        h1 { font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.05; }
+        h2 { font-size: clamp(2rem, 4vw, 3.5rem); }
+        p, a, li, span { font-size: clamp(0.95rem, 1.2vw, 1.125rem); }
+        
+        body {
+            background-color: #0a0a0a;
+            font-family: 'Inter', sans-serif;
+            color: #a3a3a3;
+        }
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; color: #ffffff; }
+
+        /* --- 2. HIDDEN SCROLLBAR (Native App Feel) --- */
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- 3. CUSTOM CURSOR --- */
+        .custom-cursor {
+            width: 20px; height: 20px;
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 99999;
+            transition: transform 0.15s ease-out, background 0.2s ease-out, border-color 0.2s ease-out;
+            transform: translate(-50%, -50%); /* Center point */
+            mix-blend-mode: difference; 
+        }
+        .custom-cursor.hovering {
+            transform: translate(-50%, -50%) scale(2.5);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #fff;
+        }
+        /* Hide custom cursor on touch devices to not break mobile UX */
+        @media (pointer: coarse) {
+            .custom-cursor { display: none !important; }
+            * { cursor: auto !important; }
+        }
+        @media (pointer: fine) {
+            * { cursor: none !important; } /* Hide default cursor on desktop */
+        }
+
+        /* --- 4. BREAKING THE GRID (Overlapping Hero) --- */
+        .geo-shape-wrapper {
+            margin-bottom: -100px; /* Pulls image down into the About section */
+            position: relative;
+            z-index: 10;
+        }
+        .geo-shape {
+            width: 100%; max-width: 350px; aspect-ratio: 1;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            background: linear-gradient(135deg, #1a1a1a, #222);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            animation: morph 10s ease-in-out infinite;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        @keyframes morph {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+            100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+        }
+
+        /* --- 5. BENTO GRID LAYOUT --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        .bento-featured {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        @media (max-width: 768px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .bento-featured { grid-column: span 1; grid-template-columns: 1fr; }
+        }
+
+        /* --- 6. HOVER TO REVEAL OVERLAY --- */
+        .project-card { position: relative; overflow: hidden; background: #111; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.05); }
+        .project-card img, .project-placeholder { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .project-card:hover img, .project-card:hover .project-placeholder { transform: scale(1.05); }
+        .project-overlay {
+            position: absolute; inset: 0; 
+            background: rgba(10, 10, 10, 0.92); 
+            backdrop-filter: blur(4px);
+            opacity: 0; 
+            transition: opacity 0.3s ease;
+            display: flex; flex-direction: column; justify-content: center; padding: 2rem;
+        }
+        .project-card:hover .project-overlay { opacity: 1; }
+        /* Make bento featured card height match others */
+        .bento-featured { min-height: 400px; }
+        .bento-grid > .project-card:not(.bento-featured) { min-height: 400px; }
+
+        /* --- 7. MOBILE TOUCH TARGETS --- */
+        @media (max-width: 768px) {
+            #mobile-menu a {
+                display: block;
+                padding: 16px 0; /* Enforces 44px+ touch height */
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                font-size: 1.1rem;
+            }
+        }
+
+        /* --- 8. TIMELINE TWEAKS --- */
+        .timeline-line {
+            position: absolute; left: 20px; top: 0; width: 2px; height: 100%;
+            background: linear-gradient(to bottom, transparent, #333, transparent);
+        }
+        @media (min-width: 768px) {
+            .timeline-line { left: 50%; transform: translateX(-50%); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 bg-primary/80 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="#home" class="text-xl font-bold text-white font-heading tracking-tight">&lt;<span class="text-accent">YN</span>/&gt;</a>
+            <div class="hidden md:flex space-x-8 text-sm font-medium tracking-wide uppercase">
+                <a href="#about" class="text-gray-400 hover:text-white transition-colors">About</a>
+                <a href="#projects" class="text-gray-400 hover:text-white transition-colors">Work</a>
+                <a href="#research" class="text-gray-400 hover:text-white transition-colors">Research</a>
+                <a href="#contact" class="text-white bg-accent px-5 py-2.5 rounded-lg hover:bg-blue-600 transition-colors">Let's Talk</a>
+            </div>
+            <button id="menu-btn" class="md:hidden text-white focus:outline-none p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-surface">
+            <div class="px-6 py-2 flex flex-col">
+                <a href="#about" class="text-gray-300">About</a>
+                <a href="#projects" class="text-gray-300">Work</a>
+                <a href="#research" class="text-gray-300">Research</a>
+                <a href="#contact" class="text-gray-300">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Broken Grid & Conversational) -->
+    <section id="home" class="min-h-screen flex items-center pt-20 pb-32 relative overflow-hidden">
+        <div class="max-w-6xl mx-auto px-6 w-full grid md:grid-cols-2 gap-16 items-center">
+            <div data-aos="fade-right" data-aos-duration="800">
+                <p class="text-accent font-medium mb-4 tracking-widest uppercase text-sm">Hello, I'm</p>
+                <h1 class="mb-6 font-bold">[Your Name]</h1>
+                <p class="text-xl md:text-2xl text-gray-400 mb-6 font-heading font-medium">
+                    ME CSE Student @ <span class="text-white">Anna University</span>.
+                </p>
+                <p class="text-gray-500 mb-8 max-w-md leading-relaxed">
+                    I spend 80% of my time debugging why a missing semicolon broke my server, and 20% writing research papers about it. Currently trying to make machines slightly less dumb.
+                </p>
+                
+                <!-- Status Widget -->
+                <div class="bg-surface border border-white/5 p-5 rounded-xl max-w-sm">
+                    <p class="text-xs text-gray-600 mb-3 font-heading tracking-widest uppercase">Current Status</p>
+                    <ul class="text-sm text-gray-400 space-y-2">
+                        <li>📍 Based in Chennai, India</li>
+                        <li>⚡ Building: [Your Side Project Name]</li>
+                        <li>📚 Reading: [e.g., Designing Data-Intensive Apps]</li>
+                        <li>☕ Surviving on: South Indian Filter Coffee</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex justify-center md:justify-end geo-shape-wrapper" data-aos="fade-left" data-aos-duration="1000">
+                <div class="geo-shape flex items-center justify-center">
+                    <!-- REPLACE: <img src="your-photo.jpg" alt="Me" class="w-full h-full object-cover"> -->
+                    <span class="text-gray-700 font-heading text-6xl font-bold select-none">IMG</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 relative z-20 border-t border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-5 gap-16 items-start">
+                <div class="md:col-span-2" data-aos="fade-right">
+                    <h2 class="mb-2 font-bold">About<br>Me.</h2>
+                    <div class="w-16 h-1 bg-accent mt-4"></div>
+                </div>
+                <div class="md:col-span-3" data-aos="fade-left">
+                    <p class="text-gray-400 leading-relaxed mb-6 text-lg">
+                        I didn't just pursue an ME in CSE at Anna University to hang another degree on the wall. I came here because I wanted to dive deeper into [Your Specialization, e.g., distributed systems/AI]—moving past just building apps, to actually understanding how they scale and think.
+                    </p>
+                    <p class="text-gray-500 leading-relaxed mb-8">
+                        My background bridges the gap between academic research and practical engineering. I can write a formal IEEE paper on a Tuesday, and build a fully functional REST API to back it up by Friday. When I'm not glued to my terminal, I'm usually [Your Hobby, e.g., participating in CTFs, playing badminton, or ranting about clean code].
+                    </p>
+                    <div class="flex flex-wrap gap-3 text-sm">
+                        <a href="#" class="border border-white/20 text-white px-6 py-3 rounded-lg hover:bg-white hover:text-black transition-all duration-300 font-medium">Download CV</a>
+                        <a href="#contact" class="text-gray-500 px-6 py-3 hover:text-accent transition-colors font-medium flex items-center gap-2">
+                            Or just say hi 
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section (Asymmetric Grid) -->
+    <section id="skills" class="py-24 bg-surface/30 border-t border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="md:col-span-1">
+                    <h2 class="mb-2 font-bold">Tech<br>Stack.</h2>
+                    <p class="text-gray-600 text-sm mt-4">Tools I use daily to turn coffee into software.</p>
+                </div>
+                <div class="md:col-span-2 grid sm:grid-cols-2 gap-6">
+                    <div class="bg-surface p-6 rounded-xl border border-white/5">
+                        <h3 class="text-sm text-gray-600 uppercase tracking-widest mb-4 font-heading">Languages</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-gray-300">Python</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">JavaScript</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">C++</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">Java</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">SQL</span>
+                        </div>
+                    </div>
+                    <div class="bg-surface p-6 rounded-xl border border-white/5">
+                        <h3 class="text-sm text-gray-600 uppercase tracking-widest mb-4 font-heading">Frontend & Backend</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-gray-300">React.js</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">Node.js</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">Tailwind</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">Express</span>
+                        </div>
+                    </div>
+                    <div class="bg-surface p-6 rounded-xl border border-white/5">
+                        <h3 class="text-sm text-gray-600 uppercase tracking-widest mb-4 font-heading">Research & ML</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-gray-300">TensorFlow</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">PyTorch</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">Pandas</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">LaTeX</span>
+                        </div>
+                    </div>
+                    <div class="bg-surface p-6 rounded-xl border border-white/5">
+                        <h3 class="text-sm text-gray-600 uppercase tracking-widest mb-4 font-heading">DevOps & Tools</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-gray-300">Git</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">Docker</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">AWS</span><span class="text-gray-700">•</span>
+                            <span class="text-gray-300">Linux</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section (Bento Grid + Hover Reveal) -->
+    <section id="projects" class="py-24 border-t border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex justify-between items-end mb-16">
+                <div>
+                    <h2 class="font-bold">Selected<br>Work.</h2>
+                    <p class="text-gray-600 text-sm mt-4 max-w-xs">Hover over a card to see what makes it tick.</p>
+                </div>
+                <a href="https://github.com/[YourUsername]" target="_blank" class="hidden md:block text-sm text-gray-500 hover:text-accent transition-colors">View all on GitHub →</a>
+            </div>
+
+            <div class="bento-grid">
+                <!-- FEATURED PROJECT (Span 2) -->
+                <div class="project-card bento-featured" data-aos="fade-up">
+                    <!-- Replace placeholder with <img src="project1.jpg"> -->
+                    <div class="project-placeholder bg-gradient-to-br from-blue-900/20 to-gray-900 flex items-center justify-center">
+                        <span class="text-gray-800 font-heading text-4xl font-bold">PROJECT 01</span>
+                    </div>
+                    <div class="project-overlay">
+                        <span class="text-accent text-xs tracking-widest uppercase mb-2">Featured Project</span>
+                        <h3 class="text-2xl font-bold text-white mb-3">[E.g., Neural Net Analytics Dashboard]</h3>
+                        <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+                            Built a robust engine that leverages [Tech] to solve [Problem]. Didn't just write the code—I wrote the research paper backing the algorithm. Achieved [X]% latency reduction.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-6 text-xs">
+                            <span class="border border-white/20 text-gray-300 px-2 py-1 rounded">Python</span>
+                            <span class="border border-white/20 text-gray-300 px-2 py-1 rounded">TensorFlow</span>
+                            <span class="border border-white/20 text-gray-300 px-2 py-1 rounded">React</span>
+                        </div>
+                        <div class="flex space-x-4 mt-auto">
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                Source
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                Live Demo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROJECT 2 -->
+                <div class="project-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="project-placeholder bg-gradient-to-br from-purple-900/20 to-gray-900 flex items-center justify-center">
+                        <span class="text-gray-800 font-heading text-3xl font-bold">PROJECT 02</span>
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="text-xl font-bold text-white mb-3">[E.g., Distributed Task Queue]</h3>
+                        <p class="text-gray-400 text-sm mb-4 leading-relaxed">Engineered a microservice to handle [X]. Reduced overhead by [Y].</p>
+                        <div class="flex flex-wrap gap-2 mb-4 text-xs">
+                            <span class="border border-white/20 text-gray-300 px-2 py-1 rounded">Node.js</span>
+                            <span class="border border-white/20 text-gray-300 px-2 py-1 rounded">Redis</span>
+                            <span class="border border-white/20 text-gray-300 px-2 py-1 rounded">Docker</span>
+                        </div>
+                        <div class="flex space-x-4 mt-auto">
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Source →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROJECT 3 -->
+                <div class="project-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="project-placeholder bg-gradient-to-br from-green-900/20 to-gray-900 flex items-center justify-center">
+                        <span class="text-gray-800 font-heading text-3xl font-bold">PROJECT 03</span>
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="text-xl font-bold text-white mb-3">[E.g., CLI Tool for Auth]</h3>
+                        <p class="text-gray-400 text-sm mb-4 leading-relaxed">Got tired of repetitive setup. Built an open-source CLI to automate it.</p>
+                        <div class="flex flex-wrap gap-2 mb-4 text-xs">
+                            <span class="border border-white/20 text-gray-300 px-2 py-1 rounded">Go</span>
+                            <span class="border border-white/20 text-gray-300 px-2 py-1 rounded">Bash</span>
+                        </div>
+                        <div class="flex space-x-4 mt-auto">
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Source →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Section -->
+    <section id="research" class="py-24 bg-surface/30 border-t border-white/5">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="font-bold mb-16">Academic<br>Research.</h2>
+            
+            <div class="space-y-0">
+                <!-- Publication 1 -->
+                <div class="border-b border-white/5 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 group" data-aos="fade-up">
+                    <div>
+                        <p class="text-xs text-gray-600 mb-2">IEEE / Springer - 2024</p>
+                        <h3 class="text-lg font-bold text-white group-hover:text-accent transition-colors">"[Title of Your Research Paper Goes Here]"</h3>
+                        <p class="text-gray-500 text-sm mt-1"><span class="text-accent">[Your Name]</span>, [Co-Author 1], [Co-Author 2]</p>
+                    </div>
+                    <span class="bg-green-500/10 text-green-400 text-xs font-bold px-3 py-1 rounded-full w-fit border border-green-500/20 shrink-0">PUBLISHED</span>
+                </div>
+
+                <!-- Publication 2 -->
+                <div class="border-b border-white/5 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 group" data-aos="fade-up">
+                    <div>
+                        <p class="text-xs text-gray-600 mb-2">Journal of [XYZ] - 2024</p>
+                        <h3 class="text-lg font-bold text-white group-hover:text-accent transition-colors">"[Title of Second Paper / Work in Progress]"</h3>
+                        <p class="text-gray-500 text-sm mt-1"><span class="text-accent">[Your Name]</span>, [Co-Author]</p>
+                    </div>
+                    <span class="bg-yellow-500/10 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full w-fit border border-yellow-500/20 shrink-0">UNDER REVIEW</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 border-t border-white/5">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="font-bold mb-4">Let's Work<br>Together.</h2>
+            <p class="text-gray-500 mb-12 max-w-md mx-auto">I'm actively looking for full-time SDE roles and research collaborations for 2025. My inbox is always open.</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16" data-aos="fade-up">
+                <a href="mailto:[YourEmail]@gmail.com" class="border border-white/20 text-white px-8 py-4 rounded-lg hover:bg-white hover:text-black transition-all duration-300 font-medium text-center">
+                    [YourEmail]@gmail.com
+                </a>
+                <a href="[Your LinkedIn URL]" target="_blank" class="text-gray-500 border border-white/10 px-8 py-4 rounded-lg hover:border-accent hover:text-accent transition-all duration-300 font-medium text-center">
+                    LinkedIn Profile →
+                </a>
+            </div>
+
+            <!-- Minimal Footer -->
+            <div class="border-t border-white/5 pt-8 mt-16">
+                <p class="text-gray-700 text-xs">
+                    Designed and built by [Your Name] with lots of coffee and <a href="https://tailwindcss.com" target="_blank" class="hover:text-accent transition-colors">Tailwind CSS</a>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize AOS
+        AOS.init({ once: true, duration: 800, easing: 'ease-out-cubic' });
+
+        // --- CUSTOM CURSOR LOGIC ---
+        const cursor = document.querySelector('.custom-cursor');
+        let cursorVisible = false;
+
+        document.addEventListener('mousemove', (e) => {
+            if (!cursorVisible) {
+                cursor.style.opacity = '1';
+                cursorVisible = true;
+            }
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cursor.style.opacity = '0';
+            cursorVisible = false;
+        });
+
+        // Add hover effect to interactive elements
+        const interactives = document.querySelectorAll('a, button, input, textarea, [data-cursor-hover]');
+        interactives.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+        });
+
+
+        // --- MOBILE MENU LOGIC ---
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        let menuOpen = false;
+
+        menuBtn.addEventListener('click', () => {
+            menuOpen = !menuOpen;
+            mobileMenu.classList.toggle('hidden');
+            menuBtn.innerHTML = menuOpen ? 
+                `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>` :
+                `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>`;
+        });
+
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                menuOpen = false;
+                menuBtn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>`;
+            });
+        });
+
+
+        // --- CONSOLE.LOG EASTER EGG ---
+        console.log('%c🛑 Wait!', 'color: #3b82f6; font-size: 24px; font-weight: bold;');
+        console.log('%cIf you are reading this, you probably know how to inspect elements. Good.', 'color: #fff; font-size: 14px; background: #222; padding: 10px;');
+        console.log('%cI am currently looking for 2025 opportunities. Let\'s connect!', 'color: #a3a3a3; font-size: 14px; background: #222; padding: 10px;');
+    </script>
+</body>
+</html>
